@@ -1,0 +1,29 @@
+{
+  "name": "flicklist",
+  "version": "1.0.0",
+  "description": "AIT final project",
+  "main": "app.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nyu-csci-ua-0480-008-spring-2017/ac4536-final-project.git"
+  },
+  "author": "Ariana Chang",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nyu-csci-ua-0480-008-spring-2017/ac4536-final-project/issues"
+  },
+  "homepage": "https://github.com/nyu-csci-ua-0480-008-spring-2017/ac4536-final-project#readme",
+  "devDependencies": {
+    "body-parser": "^1.17.1",
+    "eslint": "^3.18.0",
+    "express": "^4.15.2",
+    "express-sessions": "^1.0.6",
+    "hbs": "^4.0.1",
+    "mongoose": "^4.9.2",
+    "mongoose-url-slugs": "^0.2.1",
+    "nodemon": "^1.11.0"
+  }
+}
