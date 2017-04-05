@@ -1,0 +1,30 @@
+<h1>Add A Movie</h2>
+{{#if msg}}
+{{msg}}
+{{/if}}
+<form method="POST" action="">
+Title: <input type="text" name="title">
+Genre: <select name="genre">
+  <option value="SciFi">Sci-Fi</option>
+  <option value="Thriller">Thriller</option>
+  <option value="Romance">Romance</option>
+  <option value="Horror">Horror</option>
+  <option value="Documentary">Documentary</option>
+  <option value="Drama">Drama</option>
+  <option value="Action">Action</option>
+  <option value="Animation">Animation</option>
+  <option value="Historical">Historical</option>
+</select>
+Year [optional]: <input type="number" min="1900" max="2030" step="1" value="2016" name="year"/>
+Director [optional]: <input type="text" name="director">
+<input type="submit" value="Add Movie">
+</form>
+<hr>
+{{#each user}}
+<h1>{{username}}'s Movies</h1>
+<ul>
+{{#each movies as |movie|}}
+<li>{{movie.name}} | Genre: {{movie.genre}}</li>
+{{/each}}
+</ul>
+{{/each}}

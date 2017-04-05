@@ -33,8 +33,8 @@ require('./db');
 const mongoose = require('mongoose');
 
 //retrieve constructor models
-const User = mongoose.model("User");
 const Movie = mongoose.model("Movie");
+const User = mongoose.model("User");
 
 //route handlers
 app.get('/', function(req, res) {
@@ -45,6 +45,50 @@ app.get('/', function(req, res) {
 app.post('/', (req, res) => {
 	//if username correct, go to main page
 	//else, stay on signin page
+});
+
+app.get('/mylist', (req, res) => {
+	//adds movie to user's list
+	//temporary user before i figure out authentication stuff
+	User.find({username:'tempuser'}, (err, user) => {
+		if(err) {
+			console.log(err);
+		}
+		else {
+			console.log(user);
+			res.render('userlist', {user:user});
+		}
+	});
+});
+
+app.post('/mylist', (req, res) => {
+	const movie = new Movie({
+		name: req.body.title,
+		genre: req.body.genre
+	});
+	//save to movie db
+	movie.save((err) => {
+		if(err){
+			console.log(err);
+			const msg = 'Error: something went wrong, please try again'
+			res.render('userlist', {msg:msg, user:user});
+		}
+		console.log('movie saved');
+	});
+	//save to user's list
+	User.findOneAndUpdate(
+		{username: 'tempuser'},
+		{$push: {movies:movie}}, (err, user) => {
+			if(err) {
+				const msg = 'Error: something went wrong, please try again'
+				res.render('userlist', {msg:msg});
+			}
+			else {
+				const msg = 'Success!' + movie.name + ' was added to your list.';
+				res.render('userlist', {msg:msg, user:user});
+				//res.redirect('/mylist');
+			}
+	});
 });
 
 app.get('/random', (req, res) => {
@@ -58,4 +102,4 @@ app.get('/:filter', (req, res) => {
 });
 
 //listen on port 3000
-app.listen(3000);
+app.listen(process.env.PORT || 3000);
