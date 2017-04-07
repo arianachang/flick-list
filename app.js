@@ -153,7 +153,7 @@ app.post('/mylist', (req, res) => {
 		if(err){
 			console.log(err);
 			const msg = 'Error: something went wrong, please try again';
-			res.render('userlist', {msg:msg, user:user});
+			res.render('userlist', {msg:msg});
 		}
 		console.log('movie saved');
 	});
