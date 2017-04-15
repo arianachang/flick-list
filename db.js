@@ -19,8 +19,8 @@ const Movie = new mongoose.Schema({
 
 //define user schema
 const User = new mongoose.Schema({
-	username: {type: String, unique: true},
-	password: {type:String},
+	username: {type: String, required: true, unique: true},
+	password: {type: String},
 	//username provided by auth plugin
 	//password hash provided by auth plugin
 	movies: [Movie]

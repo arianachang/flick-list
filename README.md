@@ -69,8 +69,8 @@ An Example Movie:
 * (5 points) Integrate user authentication
     * I'm going to be using passport for user authentication
     * And account has been made for testing; I'll email you the password
-    * see <code>cs.nyu.edu/~jversoza/ait-final/register</code> for register page
-    * see <code>cs.nyu.edu/~jversoza/ait-final/login</code> for login page
+    * see <code>linserv1.cims.nyu.edu:11820/signup</code> for register page
+    * see <code>linserv1.cims.nyu.edu:11820/signin</code> for login page
 * (4 points) Perform client side form validation using a JavaScript library
     * see <code>cs.nyu.edu/~jversoza/ait-final/my-form</code>
     * if you put in a number that's greater than 5, an error message will appear in the dom
@@ -84,5 +84,6 @@ An Example Movie:
 
 ## Annotations / References Used
 
-1. [passport.js authentication docs](http://passportjs.org/docs) - (add link to source code that was based on this)
-2. [tutorial on vue.js](https://vuejs.org/v2/guide/) - (add link to source code that was based on this)
+1. [passport.js authentication docs](http://passportjs.org/docs)
+2. [tutorial on vue.js](https://vuejs.org/v2/guide/)
+3. [passport.js tutorial](https://code.tutsplus.com/tutorials/authenticating-nodejs-applications-with-passport--cms-21619)

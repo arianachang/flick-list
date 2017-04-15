@@ -23,8 +23,11 @@ Director [optional]: <input type="text" name="director">
 {{#each user}}
 <h1>{{username}}'s Movies</h1>
 <ul>
+<form method="POST" action="">
 {{#each movies as |movie|}}
-<li>{{movie.name}} | Genre: {{movie.genre}}</li>
+<li>{{movie.name}} <i>{{movie.year}}</i> | Genre: {{movie.genre}}</li> Seen It? <input type="checkbox" name="{{movie.name}}">
 {{/each}}
 </ul>
+<input type="submit" value="Mark Movies as Seen">
 {{/each}}
+</form>

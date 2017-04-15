@@ -26,7 +26,6 @@ const sessionOptions = {
 };
 app.use(session(sessionOptions));
 
-/*
 //bcrypt setup
 const bcrypt = require('bcrypt');
 
@@ -40,7 +39,7 @@ passport.use(new LocalStrategy(
       if (!user) {
         return done(null, false, { message: 'Incorrect username.' });
       }
-      if (!user.validPassword(password)) {
+      if (!validPassword(user, password)) {
         return done(null, false, { message: 'Incorrect password.' });
       }
       return done(null, user);
@@ -56,32 +55,28 @@ passport.use('signup', new LocalStrategy({
       User.findOne({'username':username},function(err, user) {
         // In case of any error return
         if (err){
-          console.log('Error in SignUp: '+err);
+          console.log('Error in Sign Up: ' + err);
           return done(err);
         }
         // already exists
         if (user) {
           console.log('User already exists');
           return done(null, false, 
-             req.flash('message','User Already Exists'));
+             req.flash('message','User already exists'));
         } else {
-          // if there is no user with that email
-          // create the user
+          // create the user & set user's local credentials
           var newUser = new User();
           // set the user's local credentials
           newUser.username = username;
           newUser.password = createHash(password);
-          newUser.email = req.param('email');
-          newUser.firstName = req.param('firstName');
-          newUser.lastName = req.param('lastName');
- 
+
           // save the user
           newUser.save(function(err) {
             if (err){
-              console.log('Error in Saving user: '+err);  
+              console.log('Error in Saving User: ' + err);  
               throw err;  
             }
-            console.log('User Registration succesful');    
+            console.log('User Registration Successful');    
             return done(null, newUser);
           });
         }
@@ -91,11 +86,49 @@ passport.use('signup', new LocalStrategy({
     // Delay the execution of findOrCreateUser and execute 
     // the method in the next tick of the event loop
     process.nextTick(findOrCreateUser);
-  });
+  })
 );
 app.use(passport.initialize());
 app.use(passport.session());
-*/
+
+passport.serializeUser(function(user, done) {
+    console.log('serializing user: ');console.log(user);
+    done(null, user._id);
+});
+
+passport.deserializeUser(function(id, done) {
+    User.findById(id, function(err, user) {
+        console.log('deserializing user:',user);
+        done(err, user);
+    });
+});
+
+function createHash(password) {
+	return bcrypt.hash(password, 10, (err, hash) => {
+		if(err) {
+			console.log(err);
+		}
+		return hash;
+	});//end bcrypt hash
+}
+
+function validPassword(user, password) {
+	console.log(user);
+	console.log(password);
+	bcrypt.compare(password, user.password, (err, passwordMatch) => {
+		if(err) {
+			console.log(err);
+		}
+		else {
+			return passwordMatch;
+		}
+	}); //end bcrypt compare
+}
+
+//flash middleware setup
+var flash = require('connect-flash');
+app.use(flash());
+
 //init connection to db
 require('./db');
 
@@ -111,27 +144,28 @@ app.get('/', function(req, res) {
 	//sign in home page
 	res.render('signin');
 });
-/*
+
 app.post('/',
   passport.authenticate('local', { successRedirect: '/mylist',
                                    failureRedirect: '/',
                                    failureFlash: true })
 );
-*/
+
 app.get('/signup', (req, res) => {
 	//create an account page
 	res.render('signup');
 });
-/*
+
 app.post('/signup', passport.authenticate('signup', {
 	successRedirect: '/mylist',
 	failureRedirect: '/signup',
 	failureFlash : true })
 );
-*/
+
 app.get('/mylist', (req, res) => {
 	//adds movie to user's list
 	//temporary user before i figure out authentication stuff
+	console.log(req.session);
 	User.find({username:'tempuser'}, (err, user) => {
 		if(err) {
 			console.log(err);
@@ -146,7 +180,9 @@ app.get('/mylist', (req, res) => {
 app.post('/mylist', (req, res) => {
 	const movie = new Movie({
 		name: req.body.title,
-		genre: req.body.genre
+		genre: req.body.genre,
+		director: req.body.director,
+		year: req.body.year
 	});
 	//save to movie db
 	movie.save((err) => {
@@ -155,21 +191,23 @@ app.post('/mylist', (req, res) => {
 			const msg = 'Error: something went wrong, please try again';
 			res.render('userlist', {msg:msg});
 		}
-		console.log('movie saved');
-	});
-	//save to user's list
-	User.findOneAndUpdate(
-		{username: 'tempuser'},
-		{$push: {movies:movie}}, (err, user) => {
-			if(err) {
-				const msg = 'Error: something went wrong, please try again';
-				res.render('userlist', {msg:msg});
-			}
-			else {
-				const msg = 'Success! ' + movie.name + ' was added to your list.';
-				//res.render('userlist', {msg:msg, user:user});
-				res.redirect('/mylist');
-			}
+		else {
+			console.log('movie saved');
+			//save to user's list
+			User.findOneAndUpdate(
+				{username: 'tempuser'},
+				{$push: {movies:movie}}, (err, user) => {
+					if(err) {
+						const msg = 'Error: something went wrong, please try again';
+						res.render('userlist', {msg:msg});
+					}
+					else {
+						const msg = 'Success! ' + movie.name + ' was added to your list.';
+						//res.render('userlist', {msg:msg, user:user});
+						res.redirect('/mylist');
+					}
+			});
+		}
 	});
 });
 
