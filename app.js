@@ -107,7 +107,6 @@ app.use(passport.session());
 
 passport.serializeUser(function(user, done) {
     console.log('serializing user: ');
-    console.log(user);
     done(null, user._id);
 });
 
@@ -166,10 +165,17 @@ app.get('/mylist', (req, res) => {
 			res.render('userlist', {user:user});
 		}
 	});*/
-	res.render('userlist', {user:req.user});
+	if(!req.user) {
+		//go to login form
+		res.redirect('/');
+	}
+	else {
+		res.render('userlist', {user:req.user});
+	}
 });
 
 app.post('/mylist', (req, res) => {
+	//handles adding a movie to list
 	const movie = new Movie({
 		name: req.body.title,
 		genre: req.body.genre,
@@ -181,7 +187,7 @@ app.post('/mylist', (req, res) => {
 		if(err){
 			console.log(err);
 			const msg = 'Error: something went wrong, please try again';
-			res.render('userlist', {msg:msg});
+			res.render('userlist', {msg:msg, user:req.user});
 		}
 		else {
 			console.log('movie saved');
@@ -191,7 +197,7 @@ app.post('/mylist', (req, res) => {
 				{$push: {movies:movie}}, (err, user) => {
 					if(err) {
 						const msg = 'Error: something went wrong, please try again';
-						res.render('userlist', {msg:msg});
+						res.render('userlist', {msg:msg, user:req.user});
 					}
 					else {
 						const msg = 'Success! ' + movie.name + ' was added to your list.';
@@ -201,6 +207,42 @@ app.post('/mylist', (req, res) => {
 			});
 		}
 	});
+});
+
+app.post('/update', (req, res) => {
+	//handles updating movie list
+	const checked = req.body.seen;
+	console.log(checked);
+	if(checked.length === 1) {
+			User.findOneAndUpdate(
+				{username: req.user.username},
+				{$set: {"movies.$.seen":true}}, (err, data) => {
+					if(err) {
+						const msg = 'Error: something went wrong, please try again';
+						res.render('userlist', {msg:msg, user:req.user});
+					}
+					else {
+						res.redirect('/mylist');
+					}
+			});
+	}
+	else {
+		for(let i=0; i<checked.length; i++) {
+			console.log(checked[i]);
+			let value = 'movies.'+ checked[i] + 'seen';
+			User.findOneAndUpdate(
+				{name: req.user.username},
+				{$set: {value:true}}, (err, data) => {
+					if(err) {
+						const msg = 'Error: something went wrong, please try again';
+						res.render('userlist', {msg:msg, user:req.user});
+					}
+					console.log(data);
+			});
+		}
+		res.redirect('/mylist');
+
+	}
 });
 
 app.get('/random', (req, res) => {

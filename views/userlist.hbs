@@ -14,20 +14,24 @@ Genre: <select name="genre">
   <option value="Action">Action</option>
   <option value="Animation">Animation</option>
   <option value="Historical">Historical</option>
+  <option value="Miscellaneous">Miscellaneous</option>
 </select>
-Year [optional]: <input type="number" min="1900" max="2030" step="1" value="2016" name="year"/>
+Year [optional]: <input type="number" min="1900" max="2030" step="1" value="2017" name="year"/>
 Director [optional]: <input type="text" name="director">
 <input type="submit" value="Add Movie">
 </form>
 <hr>
 {{#each user}}
+{{#if @last}}
 <h1>{{username}}'s Movies</h1>
 <ul>
-<form method="POST" action="">
+<form method="POST" action="/update">
 {{#each movies as |movie|}}
-<li>{{movie.name}} <i>{{movie.year}}</i> | Genre: {{movie.genre}}</li> Seen It? <input type="checkbox" name="{{movie.name}}">
+<li>{{movie.name}} <i>{{movie.year}}</i> | Genre: {{movie.genre}} {{#unless seen}}| Seen It? <input type="checkbox" name="seen" value="{{movie.name}}">{{/unless}}</li>
+{{#if movie.seen}}</del>{{/if}}
 {{/each}}
 </ul>
-<input type="submit" value="Mark Movies as Seen">
+<input type="submit" value="Mark Movie(s) as Seen">
+{{/if}}
 {{/each}}
 </form>
