@@ -27,8 +27,9 @@ Director [optional]: <input type="text" name="director">
 <ul>
 <form method="POST" action="/update">
 {{#each movies as |movie|}}
+{{#if movie.seen}}<s>{{/if}}
 <li>{{movie.name}} <i>{{movie.year}}</i> | Genre: {{movie.genre}} {{#unless seen}}| Seen It? <input type="checkbox" name="seen" value="{{movie.name}}">{{/unless}}</li>
-{{#if movie.seen}}</del>{{/if}}
+{{#if movie.seen}}</s>{{/if}}
 {{/each}}
 </ul>
 <input type="submit" value="Mark Movie(s) as Seen">

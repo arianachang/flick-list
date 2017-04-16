@@ -213,10 +213,10 @@ app.post('/update', (req, res) => {
 	//handles updating movie list
 	const checked = req.body.seen;
 	console.log(checked);
-	if(checked.length === 1) {
+	if(!Array.isArray(checked)) {
 			User.findOneAndUpdate(
-				{username: req.user.username},
-				{$set: {"movies.$.seen":true}}, (err, data) => {
+				{username: req.user.username, "movies.name":checked},
+				{$set: {"movies.$.seen": true}}, (err, data) => {
 					if(err) {
 						const msg = 'Error: something went wrong, please try again';
 						res.render('userlist', {msg:msg, user:req.user});
@@ -229,10 +229,9 @@ app.post('/update', (req, res) => {
 	else {
 		for(let i=0; i<checked.length; i++) {
 			console.log(checked[i]);
-			let value = 'movies.'+ checked[i] + 'seen';
 			User.findOneAndUpdate(
-				{name: req.user.username},
-				{$set: {value:true}}, (err, data) => {
+				{name: req.user.username, "movies.name":checked[i]},
+				{$set: {"movies.$.seen": true}}, (err, data) => {
 					if(err) {
 						const msg = 'Error: something went wrong, please try again';
 						res.render('userlist', {msg:msg, user:req.user});
