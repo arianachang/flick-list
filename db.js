@@ -8,7 +8,7 @@ const urlSlugs = require('mongoose-url-slugs');
 
 //define movie schema
 const Movie = new mongoose.Schema({
-	name: {type: String, required: true, unique: true},
+	name: {type: String, required: true},
 	director: {type: String, required: false},
 	genre: {type: String, required: true},
 	year: Number,

@@ -39,10 +39,19 @@ passport.use(new LocalStrategy(
       if (!user) {
         return done(null, false, { message: 'Incorrect username.' });
       }
-      if (!validPassword(user, password)) {
+      bcrypt.compare(password, user.password, (err, passwordMatch) => {
+		if(err) {
+			console.log(err);
+		}
+		if(!passwordMatch) {
+			return done(null, false, { message: 'Incorrect password.' });
+		}
+		return done(null, user);
+	}); //end bcrypt compare
+     /* if (!validPassword(user, password)) {
         return done(null, false, { message: 'Incorrect password.' });
       }
-      return done(null, user);
+      return done(null, user);*/
     });
   }
 ));
@@ -68,19 +77,24 @@ passport.use('signup', new LocalStrategy({
           var newUser = new User();
           // set the user's local credentials
           newUser.username = username;
-          newUser.password = createHash(password);
+          bcrypt.hash(password, 10, (err, hash) => {
+			if(err) {
+				console.log(err);
+			}
+			newUser.password = hash;
 
-          // save the user
-          newUser.save(function(err) {
-            if (err){
-              console.log('Error in Saving User: ' + err);  
-              throw err;  
+			// save the user
+            newUser.save(function(err) {
+            	if (err){
+             		console.log('Error in Saving User: ' + err);  
+              	throw err;  
             }
             console.log('User Registration Successful');    
             return done(null, newUser);
           });
-        }
-      });
+		  });//end bcrypt hash
+        }//end else
+      });//end findOne
     };
      
     // Delay the execution of findOrCreateUser and execute 
@@ -92,38 +106,17 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.serializeUser(function(user, done) {
-    console.log('serializing user: ');console.log(user);
+    console.log('serializing user: ');
+    console.log(user);
     done(null, user._id);
 });
 
 passport.deserializeUser(function(id, done) {
     User.findById(id, function(err, user) {
-        console.log('deserializing user:',user);
+        console.log('deserializing user:', user);
         done(err, user);
     });
 });
-
-function createHash(password) {
-	return bcrypt.hash(password, 10, (err, hash) => {
-		if(err) {
-			console.log(err);
-		}
-		return hash;
-	});//end bcrypt hash
-}
-
-function validPassword(user, password) {
-	console.log(user);
-	console.log(password);
-	bcrypt.compare(password, user.password, (err, passwordMatch) => {
-		if(err) {
-			console.log(err);
-		}
-		else {
-			return passwordMatch;
-		}
-	}); //end bcrypt compare
-}
 
 //flash middleware setup
 var flash = require('connect-flash');
@@ -134,6 +127,7 @@ require('./db');
 
 //mongoose setup
 const mongoose = require('mongoose');
+const ObjectId = require('mongoose').Schema.ObjectId;
 
 //retrieve constructor models
 const Movie = mongoose.model("Movie");
@@ -163,18 +157,16 @@ app.post('/signup', passport.authenticate('signup', {
 );
 
 app.get('/mylist', (req, res) => {
-	//adds movie to user's list
-	//temporary user before i figure out authentication stuff
-	console.log(req.session);
-	User.find({username:'tempuser'}, (err, user) => {
+	//displays user movie list
+	/*User.find({'_id' : ObjectId(req.session.passport.user)}, (err, user) => {
 		if(err) {
 			console.log(err);
 		}
 		else {
-			//console.log(user);
 			res.render('userlist', {user:user});
 		}
-	});
+	});*/
+	res.render('userlist', {user:req.user});
 });
 
 app.post('/mylist', (req, res) => {
@@ -195,7 +187,7 @@ app.post('/mylist', (req, res) => {
 			console.log('movie saved');
 			//save to user's list
 			User.findOneAndUpdate(
-				{username: 'tempuser'},
+				{username: req.user.username},
 				{$push: {movies:movie}}, (err, user) => {
 					if(err) {
 						const msg = 'Error: something went wrong, please try again';
