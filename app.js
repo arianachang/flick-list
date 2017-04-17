@@ -106,13 +106,11 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.serializeUser(function(user, done) {
-    console.log('serializing user: ');
     done(null, user._id);
 });
 
 passport.deserializeUser(function(id, done) {
     User.findById(id, function(err, user) {
-        console.log('deserializing user:', user);
         done(err, user);
     });
 });
@@ -156,15 +154,6 @@ app.post('/signup', passport.authenticate('signup', {
 );
 
 app.get('/mylist', (req, res) => {
-	//displays user movie list
-	/*User.find({'_id' : ObjectId(req.session.passport.user)}, (err, user) => {
-		if(err) {
-			console.log(err);
-		}
-		else {
-			res.render('userlist', {user:user});
-		}
-	});*/
 	if(!req.user) {
 		//go to login form
 		res.redirect('/');
@@ -190,7 +179,6 @@ app.post('/mylist', (req, res) => {
 			res.render('userlist', {msg:msg, user:req.user});
 		}
 		else {
-			console.log('movie saved');
 			//save to user's list
 			User.findOneAndUpdate(
 				{username: req.user.username},
@@ -212,7 +200,6 @@ app.post('/mylist', (req, res) => {
 app.post('/update', (req, res) => {
 	//handles updating movie list
 	const checked = req.body.seen;
-	console.log(checked);
 	if(!Array.isArray(checked)) {
 			User.findOneAndUpdate(
 				{username: req.user.username, "movies.name":checked},
@@ -228,7 +215,6 @@ app.post('/update', (req, res) => {
 	}
 	else {
 		for(let i=0; i<checked.length; i++) {
-			console.log(checked[i]);
 			User.findOneAndUpdate(
 				{name: req.user.username, "movies.name":checked[i]},
 				{$set: {"movies.$.seen": true}}, (err, data) => {
@@ -236,7 +222,6 @@ app.post('/update', (req, res) => {
 						const msg = 'Error: something went wrong, please try again';
 						res.render('userlist', {msg:msg, user:req.user});
 					}
-					console.log(data);
 			});
 		}
 		res.redirect('/mylist');
@@ -246,7 +231,14 @@ app.post('/update', (req, res) => {
 
 app.get('/random', (req, res) => {
 	//displays a random movie
-	//res.render('random', {movie: movie});
+	Movie.aggregate({$sample: {size: 1}}, (err, data) => {
+		if(err) {
+			console.log(err);
+		}
+		else {
+			res.render('random', {movie: data});
+		}
+	});
 });
 
 app.get('/:list/:filter', (req, res) => {
