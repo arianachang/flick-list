@@ -1,10 +1,12 @@
 <div id="login">
 <h1>Create an Account</h1>
+{{#if error}} <p id="error">Error: {{error}}</p> {{/if}}
 <form method="POST" action="">
-	<label>Username:</label> <input type="text" name="username">
-	<br><label>Password:</label> <input type="password" name="password">
+	<p class="message">Pick a username:</p>
+	<input type="text" name="username" placeholder="username">
+	<p class="message">Choose a password (must be greater than 7 characters):</p>
+	<input type="password" name="password" placeholder="password">
 	<br><input type="submit" value="Register">
 </form>
-
-Already have an account? <a href="/">Sign in!</a>
+<p class="message">Already have an account? <a href="/">Sign in!</a></p>
 </div>

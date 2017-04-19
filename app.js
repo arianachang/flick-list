@@ -29,6 +29,10 @@ app.use(session(sessionOptions));
 //bcrypt setup
 const bcrypt = require('bcrypt');
 
+//flash middleware setup
+var flash = require('connect-flash');
+app.use(flash());
+
 //passport setup
 var passport = require('passport')
   , LocalStrategy = require('passport-local').Strategy;
@@ -37,21 +41,18 @@ passport.use(new LocalStrategy(
     User.findOne({ username: username }, (err, user) => {
       if (err) { return done(err); }
       if (!user) {
-        return done(null, false, { message: 'Incorrect username.' });
+        return done(null, false, {'message':'Incorrect username.'});
       }
       bcrypt.compare(password, user.password, (err, passwordMatch) => {
 		if(err) {
 			console.log(err);
 		}
 		if(!passwordMatch) {
-			return done(null, false, { message: 'Incorrect password.' });
+			console.log('incorrect pw');
+			return done(null, false, {'message':'Incorrect password.'});
 		}
 		return done(null, user);
 	}); //end bcrypt compare
-     /* if (!validPassword(user, password)) {
-        return done(null, false, { message: 'Incorrect password.' });
-      }
-      return done(null, user);*/
     });
   }
 ));
@@ -71,7 +72,7 @@ passport.use('signup', new LocalStrategy({
         if (user) {
           console.log('User already exists');
           return done(null, false, 
-             req.flash('message','User already exists'));
+             {'message':'User already exists.'});
         } else {
           // create the user & set user's local credentials
           var newUser = new User();
@@ -115,10 +116,6 @@ passport.deserializeUser(function(id, done) {
     });
 });
 
-//flash middleware setup
-var flash = require('connect-flash');
-app.use(flash());
-
 //init connection to db
 require('./db');
 
@@ -132,8 +129,13 @@ const User = mongoose.model("User");
 
 //route handlers
 app.get('/', function(req, res) {
-	//sign in home page
-	res.render('signin');
+	if(!req.user) {
+		//if user not signed in, go to log in
+		res.render('signin', {error: req.flash('error')});
+	}
+	else {
+		res.render('userlist', {user:req.user});
+	}
 });
 
 app.post('/',
@@ -144,7 +146,7 @@ app.post('/',
 
 app.get('/signup', (req, res) => {
 	//create an account page
-	res.render('signup');
+	res.render('signup', {error: req.flash('error')});
 });
 
 app.post('/signup', passport.authenticate('signup', {
@@ -225,7 +227,6 @@ app.post('/update', (req, res) => {
 			});
 		}
 		res.redirect('/mylist');
-
 	}
 });
 

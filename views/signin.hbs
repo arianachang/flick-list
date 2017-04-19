@@ -1,10 +1,10 @@
 <div id="login">
 <h1>Log In</h1>
+{{#if error}} <p id="error">Error: {{error}}</p> {{/if}}
 <form method="POST" action="">
-	<label>Username:</label> <input type="text" name="username">
-	<br><label>Password:</label> <input type="password" name="password">
+	<input type="text" name="username" placeholder="username">
+	<input type="password" name="password" placeholder="password">
 	<br><input type="submit" value="Sign In">
 </form>
-
-Don't have an account? <a href="/signup">Create one!</a>
+<p class="message">Don't have an account? <a href="/signup">Create one!</a></p>
 </div>
