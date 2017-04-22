@@ -1,12 +1,15 @@
+<script src="ajaxFilter.js"></script>
+<div id="container">
 <div class="leftContainer">
   Filter movies by:
-  <form>
-   <input type="radio" name="filter" value="default">Date Added<br>
+  <form method="GET" action="" id="filterForm">
+   <input type="radio" name="filter" value="default" checked="true">Order Added (Default)<br>
    <input type="radio" name="filter" value="title">Title (A-Z)<br>
    <input type="radio" name="filter" value="genre">Genre<br>
    <input type="radio" name="filter" value="year">Year<br>
-   <input type="radio" name="filter" value="genre">Director<br>
-   <input type="submit" value="Apply Filter">
+   <input type="radio" name="filter" value="director">Director<br>
+   <input type="radio" name="filter" value="seen">Seen<br>
+   <input type="submit" value="Apply Filter" id="filterBtn">
   </form>
 </div>
 <div class="main">
@@ -17,7 +20,7 @@
   <form method="POST" action="/update">
   {{#each movies as |movie|}}
   {{#if movie.seen}}<s>{{/if}}
-  <li>{{movie.name}} <i>{{movie.year}}</i> | Genre: {{movie.genre}} {{#unless seen}}| Seen It? <input type="checkbox" name="seen" value="{{movie.name}}">{{/unless}}</li>
+  <li>{{movie.name}} <i>{{movie.year}}</i> | Genre: {{movie.genre}} {{#if director}}| Director: {{movie.director}}{{/if}} {{#unless seen}}| Seen It? <input type="checkbox" name="seen" value="{{movie.name}}">{{/unless}}</li>
   {{#if movie.seen}}</s>{{/if}}
   {{/each}}
   </ul>
@@ -29,25 +32,26 @@
 <div class="rightContainer">
   <h1>Add A Movie</h2>
   {{#if msg}}
-  {{msg}}
+  <article class="error">{{msg}}</article>
   {{/if}}
   <form method="POST" action="">
   Title: <input type="text" name="title">
   <br>Genre: <select name="genre">
-    <option value="SciFi">Sci-Fi</option>
-    <option value="Thriller">Thriller</option>
-    <option value="Romance">Romance</option>
-    <option value="Horror">Horror</option>
+    <option value="Action">Action</option>
+    <option value="Animation">Animation</option>
     <option value="Comedy">Comedy</option>
     <option value="Documentary">Documentary</option>
     <option value="Drama">Drama</option>
-    <option value="Action">Action</option>
-    <option value="Animation">Animation</option>
     <option value="Historical">Historical</option>
+    <option value="Horror">Horror</option>
+    <option value="Romance">Romance</option>
+    <option value="SciFi">Sci-Fi</option>
+    <option value="Thriller">Thriller</option>
     <option value="Miscellaneous">Miscellaneous</option>
   </select>
   <br>Year [optional]: <input type="number" min="1900" max="2030" step="1" value="2017" name="year"/>
   <br>Director [optional]: <input type="text" name="director">
   <br><input type="submit" value="Add Movie">
   </form>
+</div>
 </div>

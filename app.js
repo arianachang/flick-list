@@ -78,22 +78,29 @@ passport.use('signup', new LocalStrategy({
           var newUser = new User();
           // set the user's local credentials
           newUser.username = username;
-          bcrypt.hash(password, 10, (err, hash) => {
-			if(err) {
-				console.log(err);
-			}
-			newUser.password = hash;
 
-			// save the user
-            newUser.save(function(err) {
-            	if (err){
-             		console.log('Error in Saving User: ' + err);  
-              	throw err;  
-            }
-            console.log('User Registration Successful');    
-            return done(null, newUser);
-          });
-		  });//end bcrypt hash
+          //check if pw is greater than 8 chars
+          if(password.length < 8) {
+          	return done(null, false, {'message': 'Password must be at least 8 characters'});
+          }
+          else {
+			bcrypt.hash(password, 10, (err, hash) => {
+				if(err) {
+					console.log(err);
+				}
+				newUser.password = hash;
+
+				// save the user
+	            newUser.save(function(err) {
+	            	if (err){
+	             		console.log('Error in Saving User: ' + err);  
+	              	throw err;  
+	            }
+	            console.log('User Registration Successful');    
+	            return done(null, newUser);
+	            });
+			});//end bcrypt hash
+          }
         }//end else
       });//end findOne
     };
@@ -192,6 +199,7 @@ app.post('/mylist', (req, res) => {
 					else {
 						const msg = 'Success! ' + movie.name + ' was added to your list.';
 						//res.render('userlist', {msg:msg, user:user});
+						console.log(movie);
 						res.redirect('/mylist');
 					}
 			});
@@ -230,6 +238,17 @@ app.post('/update', (req, res) => {
 	}
 });
 
+app.get('/movies', (req, res) => {
+	Movie.find({}, (err, movies) => {
+		if(err) {
+			console.log(err);
+		}
+		else {
+			res.render('movies', {movies:movies});
+		}
+	});
+});
+
 app.get('/random', (req, res) => {
 	//displays a random movie
 	Movie.aggregate({$sample: {size: 1}}, (err, data) => {
@@ -240,12 +259,6 @@ app.get('/random', (req, res) => {
 			res.render('random', {movie: data});
 		}
 	});
-});
-
-app.get('/:list/:filter', (req, res) => {
-	const list = req.params.list; //either user list or all movies list
-	const filter = req.params.filter;
-	//filters movie recommendations for all movies
 });
 
 //listen on port 3000

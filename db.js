@@ -3,9 +3,6 @@
 //mongoose setup
 const mongoose = require('mongoose');
 
-//url slugs setup
-const urlSlugs = require('mongoose-url-slugs');
-
 //define movie schema
 const Movie = new mongoose.Schema({
 	name: {type: String, required: true},

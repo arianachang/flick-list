@@ -1,0 +1,22 @@
+<div id="container">
+<div class="leftContainer">
+  Filter movies by:
+  <form method="GET" action="" id="filterForm">
+   <input type="radio" name="filter" value="default">Date Added<br>
+   <input type="radio" name="filter" value="title">Title (A-Z)<br>
+   <input type="radio" name="filter" value="genre">Genre<br>
+   <input type="radio" name="filter" value="year">Year<br>
+   <input type="radio" name="filter" value="director">Director<br>
+   <input type="submit" value="Apply Filter" id="filterBtn">
+  </form>
+</div>
+
+<div class="main">
+<h1>All Movies</h1>
+<ul>
+{{#each movies as |movie|}}
+  <li>{{movie.name}} <i>{{movie.year}}</i> | Genre: {{movie.genre}} {{#if director}}| Director: {{movie.director}}{{/if}}</li>
+{{/each}}
+</ul>
+</div>
+</div>
