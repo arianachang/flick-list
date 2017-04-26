@@ -19,7 +19,7 @@ svg {
 }
 
 h1 {
-	padding:0;
+	padding: 0;
 	margin: 0 0 10px 0;
   font-family:'Playfair Display', serif;
   font-size:2em;
@@ -37,6 +37,36 @@ a:hover, a:active {
   letter-spacing:1px;
 }
 
+ul {
+  padding-left:0;
+  margin-left:0;
+}
+
+.error {
+  font-family: "Roboto", sans-serif;
+  color: #ff4242;
+}
+
+input[type=submit] {
+  font-family: "Roboto", sans-serif;
+  text-transform: uppercase;
+  font-size: 0.75em;
+  letter-spacing:2px;
+  outline: 0;
+  background: #f5f5f5;
+  padding: 7px;
+  border: 1px dashed #5b5b5b;
+  color: #5b5b5b;
+  transition: all 0.3s;
+  margin-top: 5px;
+}
+
+input[type=submit]:hover {
+  color: #000000;
+  border: 1px dashed black;
+}
+
+/* navigation/header styles */
 #navigation {
   font-family: "Roboto", sans-serif;
   text-transform: uppercase;
@@ -73,6 +103,7 @@ a:hover, a:active {
   color: #000000;
 }
 
+/* user list styles */
 #container {
   width: 95%;
   margin: auto;
@@ -90,7 +121,7 @@ a:hover, a:active {
 .leftContainer {
 	float: left;
 	width: 25%;
-	padding: 5px;
+	padding: 10px 5px 5px 5px;
 }
 
 .main {
@@ -99,6 +130,7 @@ a:hover, a:active {
 	padding: 5px;
 }
 
+/* login/registration styles */
 #login {
   position: relative;
   top: 100px;
@@ -153,11 +185,33 @@ a:hover, a:active {
 	color: white;
 }
 
-.error {
-  font-family: "Roboto", sans-serif;
-  color: #ff4242;
+/* movie table styles */
+.movies {
+  float: left;
+  padding: 5px;
 }
 
+table {
+  border-collapse: collapse;
+}
+
+td, th {
+  border: 1px solid #333;
+  text-align: left;
+  padding: 5px;
+}
+
+tr:nth-child(2n) {
+  background-color: #E5E4E4;
+}
+
+th {
+  font-weight:bold;
+  background-color: #5b5b5b;
+  color: #fff;
+}
+
+/* media queries */
 @media screen and (max-width: 660px) {
     
     #container {

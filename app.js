@@ -173,6 +173,11 @@ app.get('/mylist', (req, res) => {
 });
 
 app.post('/mylist', (req, res) => {
+	//handles creating a new movie
+	if(!req.body.title || !req.body.genre) {
+		const msg = 'Error: Title and genre are required fields.';
+		res.render('userlist', {msg:msg, user:req.user});	
+	}
 	//handles adding a movie to list
 	const movie = new Movie({
 		name: req.body.title,
@@ -208,7 +213,7 @@ app.post('/mylist', (req, res) => {
 });
 
 app.post('/update', (req, res) => {
-	//handles updating movie list
+	//handles updating user movie list (delete movies, mark as seen)
 	const checked = req.body.seen;
 	if(!Array.isArray(checked)) {
 			User.findOneAndUpdate(
@@ -239,14 +244,93 @@ app.post('/update', (req, res) => {
 });
 
 app.get('/movies', (req, res) => {
+	//displays all movies in db
 	Movie.find({}, (err, movies) => {
 		if(err) {
 			console.log(err);
 		}
 		else {
-			res.render('movies', {movies:movies});
+			res.render('movies', {movies:movies, user:req.user});
 		}
 	});
+});
+
+app.post('/addToList', (req, res) => {
+	//handles adding movies to user movie list from total movies db
+	const checked = req.body.seen;
+	if(!Array.isArray(checked)) {
+			User.findOneAndUpdate(
+				{username: req.user.username},
+				{$push: {movies:checked}}, (err, data) => {
+					if(err) {
+						const msg = 'Error: something went wrong, please try again';
+						res.render('movies', {msg:msg, user:req.user});
+					}
+					else {
+						//const msg = 'Success! ' + movie.name + ' was added to your list.';
+						//res.render('userlist', {msg:msg, user:user});
+						res.redirect('/mylist');
+					}
+			});
+	}
+	else {
+		for(let i=0; i<checked.length; i++) {
+			User.findOneAndUpdate(
+				{name: req.user.username},
+				{$push: {movies:checked[i]}}, (err, data) => {
+					if(err) {
+						const msg = 'Error: something went wrong, please try again';
+						res.render('userlist', {msg:msg, user:req.user});
+					}
+			});
+		}
+		//res.redirect('/mylist');
+		const msg = 'Movies successfully added!';
+		res.render('userlist', {msg:msg, user:user});
+	}
+});
+
+app.get('/api/movies', (req, res) => {
+	//filters movies in db
+	let movieFilter = {};
+	if(req.query) {
+		const filter = req.query.filter;
+		switch(filter) {
+			case 'title': movieFilter.name = 1;
+						break;
+			case 'genre': movieFilter.genre = 1;
+						break;
+			case 'director': movieFilter.director = 1;
+						break;
+			case 'year': movieFilter.year = 1;
+						break;
+			case 'default': break;
+			//case 'seen': //show movies user has seen
+						//movieFilter.seen = 'true';
+						//break;
+		}
+	}
+	Movie.find({}).sort(movieFilter).exec(function(err, movies) {
+		res.json(movies.map((ele) => {
+			return {
+				"name": ele.name,
+				"director": ele.director,
+				"year": ele.year,
+				"genre": ele.genre
+			}
+		}));
+	});
+});
+
+app.get('/api/user_data', function(req, res) {
+	//returns username for current session, for use in ajaxFilter.js script
+	if (req.user === undefined) {
+		res.json({});
+	} else {
+		res.json({
+			user: "true"
+		});
+	}
 });
 
 app.get('/random', (req, res) => {
@@ -259,6 +343,12 @@ app.get('/random', (req, res) => {
 			res.render('random', {movie: data});
 		}
 	});
+});
+
+app.get('/logout', (req, res) => {
+	//logs out the current user
+	req.logout();
+	res.redirect('/');
 });
 
 //listen on port 3000

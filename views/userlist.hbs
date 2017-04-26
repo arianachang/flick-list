@@ -1,4 +1,3 @@
-<script src="ajaxFilter.js"></script>
 <div id="container">
 <div class="leftContainer">
   Filter movies by:
@@ -24,7 +23,7 @@
   {{#if movie.seen}}</s>{{/if}}
   {{/each}}
   </ul>
-  <input type="submit" value="Mark Movie(s) as Seen">
+  <center><input type="submit" value="Mark Movie(s) as Seen"></center>
   {{/if}}
   {{/each}}
   </form>
@@ -49,7 +48,7 @@
     <option value="Thriller">Thriller</option>
     <option value="Miscellaneous">Miscellaneous</option>
   </select>
-  <br>Year [optional]: <input type="number" min="1900" max="2030" step="1" value="2017" name="year"/>
+  <br>Year [optional]: <input type="number" min="1900" max="2030" step="1" name="year"/>
   <br>Director [optional]: <input type="text" name="director">
   <br><input type="submit" value="Add Movie">
   </form>

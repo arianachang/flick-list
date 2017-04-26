@@ -1,8 +1,9 @@
 <div id="container">
+<script src="ajaxFilter.js"></script>
 <div class="leftContainer">
   Filter movies by:
   <form method="GET" action="" id="filterForm">
-   <input type="radio" name="filter" value="default">Date Added<br>
+   <input type="radio" name="filter" value="default" checked="true">Order Added<br>
    <input type="radio" name="filter" value="title">Title (A-Z)<br>
    <input type="radio" name="filter" value="genre">Genre<br>
    <input type="radio" name="filter" value="year">Year<br>
@@ -11,12 +12,30 @@
   </form>
 </div>
 
-<div class="main">
+<div class="movies">
 <h1>All Movies</h1>
-<ul>
-{{#each movies as |movie|}}
-  <li>{{movie.name}} <i>{{movie.year}}</i> | Genre: {{movie.genre}} {{#if director}}| Director: {{movie.director}}{{/if}}</li>
-{{/each}}
-</ul>
+{{#if user}}<form method="POST" action="/addToList">{{/if}}
+<table>
+  <thead>
+    <th>Title</th>
+    <th>Year</th>
+    <th>Director</th>
+    <th>Genre</th>
+    {{#if user}}<th>Add to My List</th>{{/if}}
+  </thead>
+  <tbody id="movie-list">
+    {{#each movies as |movie|}}
+    <tr>
+      <td>{{movie.name}}</td> 
+      <td>{{movie.year}}</td> 
+      <td>{{movie.director}}</td>
+      <td>{{movie.genre}}</td>
+      {{#if ../user}}<td><center><input type="checkbox" name="add" value="{{movie.name}}"></center></td>{{/if}}
+    </tr>
+    {{/each}}
+  </tbody>
+</table>
+{{#if user}}<br><center><input type="submit" value="Add Movie(s) to Watch List"></center>{{/if}}
+</form>
 </div>
 </div>
