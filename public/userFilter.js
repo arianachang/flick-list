@@ -8,7 +8,7 @@ function filterResults(event) {
 	//grab filter value
 	const filter = document.querySelector('input[name="filter"]:checked').value;
 
-	let url = 'http://localhost:3000/api/user_movies';
+	let url = 'http://linserv1.cims.nyu.edu:11820/api/user_movies';
 
 	if(filter) {
 		url += '?filter=' + filter;
