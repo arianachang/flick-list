@@ -1,3 +1,4 @@
+<script src="userFilter.js"></script>
 <div id="container">
 <div class="leftContainer">
   Filter movies by:
@@ -17,11 +18,13 @@
   <h1>{{username}}'s Movies</h1>
   <ul>
   <form method="POST" action="/update">
+  <span id="movie-list">
   {{#each movies as |movie|}}
   {{#if movie.seen}}<s>{{/if}}
   <li>{{movie.name}} <i>{{movie.year}}</i> | Genre: {{movie.genre}} {{#if director}}| Director: {{movie.director}}{{/if}} {{#unless seen}}| Seen It? <input type="checkbox" name="seen" value="{{movie.name}}">{{/unless}}</li>
   {{#if movie.seen}}</s>{{/if}}
   {{/each}}
+  </span>
   </ul>
   <center><input type="submit" value="Mark Movie(s) as Seen"></center>
   {{/if}}
@@ -53,4 +56,5 @@
   <br><input type="submit" value="Add Movie">
   </form>
 </div>
+<footer><a href="/logout">Log Out</footer>
 </div>

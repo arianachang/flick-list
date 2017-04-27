@@ -1,5 +1,5 @@
 //ajaxFilter.js
-//script for handling filter form submit
+//script for handling movie filter form submit
 
 function filterResults(event) {
 	//prevent form submission
@@ -7,7 +7,6 @@ function filterResults(event) {
 
 	//see if a user is logged in
 	const loggedIn = userLoggedIn();
-	console.log(loggedIn);
 
 	//grab filter value
 	const filter = document.querySelector('input[name="filter"]:checked').value;
@@ -33,31 +32,26 @@ function filterResults(event) {
 			}).reduce(function(acc, el){
 				return acc+el;
 			}, '');
-			console.log(str);
 			const movieTable = document.querySelector('#movie-list');
 			movieTable.innerHTML = str;
 		}
 	});
 	req.addEventListener('error', function(e) {
-		console.log('something happened', e);
+		document.querySelector('.movies').appendChild('Something went wrong, please try again');
 	});
 	req.send();
 }
 
 function userLoggedIn() {
-	//get user data
-	let loggedIn;
+	//returns true if a user is currently logged in, false if not
+	let loggedIn = false;
 	const userReq = new XMLHttpRequest();
 	userReq.open('GET', 'http://localhost:3000/api/user_data', false);
 	userReq.addEventListener('load', function() {
 		if(userReq.status >= 200 && userReq.status < 400) {
-			const user = JSON.parse(userReq.responseText);
-			console.log(user);
-			if(user) {
+			const data = JSON.parse(userReq.responseText);
+			if(data.user) {
 				loggedIn = true;
-			}
-			else {
-				loggedIn = false;
 			}
 		}
 	});

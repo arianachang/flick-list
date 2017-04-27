@@ -231,7 +231,7 @@ app.post('/update', (req, res) => {
 	else {
 		for(let i=0; i<checked.length; i++) {
 			User.findOneAndUpdate(
-				{name: req.user.username, "movies.name":checked[i]},
+				{username: req.user.username, "movies.name":checked[i]},
 				{$set: {"movies.$.seen": true}}, (err, data) => {
 					if(err) {
 						const msg = 'Error: something went wrong, please try again';
@@ -248,6 +248,7 @@ app.get('/movies', (req, res) => {
 	Movie.find({}, (err, movies) => {
 		if(err) {
 			console.log(err);
+			res.render('error', {msg:err});
 		}
 		else {
 			res.render('movies', {movies:movies, user:req.user});
@@ -276,7 +277,7 @@ app.post('/addToList', (req, res) => {
 	else {
 		for(let i=0; i<checked.length; i++) {
 			User.findOneAndUpdate(
-				{name: req.user.username},
+				{username: req.user.username},
 				{$push: {movies:checked[i]}}, (err, data) => {
 					if(err) {
 						const msg = 'Error: something went wrong, please try again';
@@ -305,12 +306,13 @@ app.get('/api/movies', (req, res) => {
 			case 'year': movieFilter.year = 1;
 						break;
 			case 'default': break;
-			//case 'seen': //show movies user has seen
-						//movieFilter.seen = 'true';
-						//break;
 		}
 	}
 	Movie.find({}).sort(movieFilter).exec(function(err, movies) {
+		if(err) {
+			console.log(error);
+			res.render('error', {msg:err});
+		}
 		res.json(movies.map((ele) => {
 			return {
 				"name": ele.name,
@@ -323,7 +325,7 @@ app.get('/api/movies', (req, res) => {
 });
 
 app.get('/api/user_data', function(req, res) {
-	//returns username for current session, for use in ajaxFilter.js script
+	//returns value if a user is currently logged in, for use in ajaxFilter.js script
 	if (req.user === undefined) {
 		res.json({});
 	} else {
@@ -333,11 +335,110 @@ app.get('/api/user_data', function(req, res) {
 	}
 });
 
+app.get('/api/user_movies', (req, res) => {
+	//filters movies for a user's list
+	if(req.user) {
+		let movieFilter = {};
+		let compareFn;
+		if(req.query) {
+			const filter = req.query.filter;
+			switch(filter) {
+				case 'title': compareFn = function(m1, m2) {
+									m1.name.toUpperCase();
+									m2.name.toUpperCase();
+									if(m1.name < m2.name) {
+										return -1;
+									}
+									if(m1.name > m2.name) {
+										return 1;
+									}
+									return 0;
+							}
+							break;
+				case 'genre': compareFn = compareFn = function(m1, m2) {
+									m1.genre.toUpperCase();
+									m2.genre.toUpperCase();
+									if(m1.genre < m2.genre) {
+										return -1;
+									}
+									if(m1.genre > m2.genre) {
+										return 1;
+									}
+									return 0;
+							}
+							break;
+				case 'director': compareFn = compareFn = function(m1, m2) {
+									m1.director.toUpperCase();
+									m2.director.toUpperCase();
+									if(m1.director < m2.director) {
+										return -1;
+									}
+									if(m1.director > m2.director) {
+										return 1;
+									}
+									return 0;
+							}
+							break;
+				case 'year': compareFn = compareFn = function(m1, m2) {
+									if(m1.year < m2.year) {
+										return -1;
+									}
+									if(m1.year > m2.year) {
+										return 1;
+									}
+									return 0;
+							}
+							break;
+				case 'seen': compareFn = compareFn = function(m1, m2) {
+									if(m1.seen === true) {
+										return -1;
+									}
+									if(m1.genre === false) {
+										return 1;
+									}
+							}
+							break;
+				case 'default': break;
+			}
+		}
+		User.findOne({username:req.user.username}).lean().exec((err, user) => {
+			const copy = user.movies.slice();
+			if(req.query.filter === 'default') {
+				res.json(copy.map((ele) => {
+					return {
+						"name": ele.name,
+						"director": ele.director,
+						"year": ele.year,
+						"genre": ele.genre,
+						"seen": ele.seen
+					}
+				}));
+			}
+			else {
+				const sorted = copy.sort(compareFn);
+				res.json(sorted.map((ele) => {
+					return {
+						"name": ele.name,
+						"director": ele.director,
+						"year": ele.year,
+						"genre": ele.genre,
+						"seen": ele.seen
+					}
+				}));
+			}
+		});//end user.find
+	}
+	else {
+		res.render('error', {msg:'You must be logged in to view this data.'});
+	}
+});
+
 app.get('/random', (req, res) => {
 	//displays a random movie
 	Movie.aggregate({$sample: {size: 1}}, (err, data) => {
 		if(err) {
 			console.log(err);
+			res.render('error', {msg:err});
 		}
 		else {
 			res.render('random', {movie: data});

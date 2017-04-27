@@ -1,12 +1,14 @@
 <div id="container">
 <center>
 <h1>Random Movie!</h1>
+<span id="random">
 The movie you should watch is...<br>
 {{#each movie}}
-Title: {{name}}
+Title: <i>{{name}}</i>
 <br>Genre: {{genre}}
 {{#if director}}<br>Director: {{director}}{{/if}}
 {{#if year}}<br>Year: {{year}} {{/if}}
 {{/each}}
+</span>
 </center>
 </div>
