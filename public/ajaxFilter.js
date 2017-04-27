@@ -46,7 +46,7 @@ function userLoggedIn() {
 	//returns true if a user is currently logged in, false if not
 	let loggedIn = false;
 	const userReq = new XMLHttpRequest();
-	userReq.open('GET', 'http://localhost:3000/api/user_data', false);
+	userReq.open('GET', 'http://linserv1.cims.nyu.edu:11820/api/user_data', false);
 	userReq.addEventListener('load', function() {
 		if(userReq.status >= 200 && userReq.status < 400) {
 			const data = JSON.parse(userReq.responseText);
