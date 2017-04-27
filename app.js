@@ -204,7 +204,7 @@ app.post('/mylist', (req, res) => {
 					else {
 						const msg = 'Success! ' + movie.name + ' was added to your list.';
 						//res.render('userlist', {msg:msg, user:user});
-						console.log(movie);
+						//console.log(movie);
 						res.redirect('/mylist');
 					}
 			});
@@ -214,32 +214,38 @@ app.post('/mylist', (req, res) => {
 
 app.post('/update', (req, res) => {
 	//handles updating user movie list (delete movies, mark as seen)
-	const checked = req.body.seen;
-	if(!Array.isArray(checked)) {
-			User.findOneAndUpdate(
-				{username: req.user.username, "movies.name":checked},
-				{$set: {"movies.$.seen": true}}, (err, data) => {
-					if(err) {
-						const msg = 'Error: something went wrong, please try again';
-						res.render('userlist', {msg:msg, user:req.user});
-					}
-					else {
-						res.redirect('/mylist');
-					}
-			});
+	if(!req.body.seen) {
+		const msg = 'Error: you didn\'t select any movies!';
+		res.render('userlist', {err:msg, user:req.user});
 	}
 	else {
-		for(let i=0; i<checked.length; i++) {
-			User.findOneAndUpdate(
-				{username: req.user.username, "movies.name":checked[i]},
-				{$set: {"movies.$.seen": true}}, (err, data) => {
-					if(err) {
-						const msg = 'Error: something went wrong, please try again';
-						res.render('userlist', {msg:msg, user:req.user});
-					}
-			});
+		const checked = req.body.seen;
+		if(!Array.isArray(checked)) {
+				User.findOneAndUpdate(
+					{username: req.user.username, "movies.name":checked},
+					{$set: {"movies.$.seen": true}}, (err, data) => {
+						if(err) {
+							const msg = 'Error: something went wrong, please try again';
+							res.render('userlist', {msg:msg, user:req.user});
+						}
+						else {
+							res.redirect('/mylist');
+						}
+				});
 		}
-		res.redirect('/mylist');
+		else {
+			for(let i=0; i<checked.length; i++) {
+				User.findOneAndUpdate(
+					{username: req.user.username, "movies.name":checked[i]},
+					{$set: {"movies.$.seen": true}}, (err, data) => {
+						if(err) {
+							const msg = 'Error: something went wrong, please try again';
+							res.render('userlist', {msg:msg, user:req.user});
+						}
+				});
+			}
+			res.redirect('/mylist');
+		}
 	}
 });
 
@@ -258,36 +264,67 @@ app.get('/movies', (req, res) => {
 
 app.post('/addToList', (req, res) => {
 	//handles adding movies to user movie list from total movies db
-	const checked = req.body.seen;
-	if(!Array.isArray(checked)) {
-			User.findOneAndUpdate(
-				{username: req.user.username},
-				{$push: {movies:checked}}, (err, data) => {
-					if(err) {
-						const msg = 'Error: something went wrong, please try again';
+	if(!req.body.add) {
+		const msg = 'Error: you didn\'t select any movies!';
+		res.render('movies', {msg:msg, user:req.user});
+	}
+	else {
+		const checked = req.body.add;
+		if(!Array.isArray(checked)) {
+			Movie.findOne({name:checked}, (err, movie) => {
+				User.findOne({username:req.user.username, 'movies.name':checked}, (err, data) => {
+					if(data) { //movie exists in user's list
+						const msg = `Error: ${checked} is already in your list!`;
+						exists = true;
 						res.render('movies', {msg:msg, user:req.user});
 					}
 					else {
-						//const msg = 'Success! ' + movie.name + ' was added to your list.';
-						//res.render('userlist', {msg:msg, user:user});
-						res.redirect('/mylist');
-					}
-			});
-	}
-	else {
-		for(let i=0; i<checked.length; i++) {
-			User.findOneAndUpdate(
-				{username: req.user.username},
-				{$push: {movies:checked[i]}}, (err, data) => {
-					if(err) {
-						const msg = 'Error: something went wrong, please try again';
-						res.render('userlist', {msg:msg, user:req.user});
-					}
-			});
+						User.findOneAndUpdate(
+							{username: req.user.username},
+							{$push: {movies:movie}}, (err, data) => {
+								if(err) {
+										const msg = 'Error: something went wrong, please try again';
+										console.log(err);
+										res.render('movies', {msg:msg, user:req.user});
+									}
+									else {
+										//const msg = 'Success! ' + movie.name + ' was added to your list.';
+										//res.render('userlist', {msg:msg, user:user});
+										res.redirect('/mylist');
+									}
+						});//end user find one
+					}//end else
+				});//end user find
+			});//end movie find
 		}
-		//res.redirect('/mylist');
-		const msg = 'Movies successfully added!';
-		res.render('userlist', {msg:msg, user:user});
+		else {
+			for(let i=0; i<checked.length; i++) {
+				Movie.findOne({name:checked[i]}, (err, movie) => {
+					User.findOne({username:req.user.username, 'movies.name':checked[i]}, (err, data) => {
+						if(data) { //movie exists in user's list
+							console.log('Error: movie is already in your list and was not added.');
+						}
+						else {
+							User.findOneAndUpdate(
+								{username: req.user.username},
+								{$push: {movies:movie}}, (err, data) => {
+									if(err) {
+										const msg = 'Error: something went wrong, please try again';
+										console.log(err);
+										res.render('movies', {msg:msg, user:req.user});
+									}
+									else {
+										msgs += 'Success! ' + checked[i] + ' was added to your list.<br>';
+									}
+							});//end user find one
+						}//end else
+					});//end user find
+				});
+			}
+			res.redirect('/mylist');
+			//const msg = 'Movies successfully added!';
+			//res.render('userlist', {err:msgs, user:req.user});
+		}
 	}
 });
 
@@ -450,6 +487,11 @@ app.get('/logout', (req, res) => {
 	//logs out the current user
 	req.logout();
 	res.redirect('/');
+});
+
+app.get('*', (req, res) => {
+	//handles 404 page not found
+	res.render('error', {msg:res.status});
 });
 
 //listen on port 3000

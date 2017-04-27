@@ -46,6 +46,20 @@ ul {
   font-family: "Roboto", sans-serif;
   color: #ff4242;
 }
+input[type=text], input[type=number] {
+  font-family:"Roboto", sans-serif;
+  font-weight:300;
+    background: transparent;
+    border: none;
+    border: 1px dashed #5b5b5b;
+    outline: none;
+    margin: 5px;
+    padding: 5px 5px 5px 5px;
+}
+
+input[type=text]:focus, input[type=number]:focus {
+    border: 1px dashed #ccc;
+}
 
 input[type=submit], footer a {
   font-family: "Roboto", sans-serif;
@@ -140,7 +154,7 @@ footer {
 #random {
   font-family:"Roboto", sans-serif;
   font-weight:300;
-  font-size: 2em;
+  font-size: 1.5em;
 }
 
 /* login/registration styles */

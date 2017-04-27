@@ -41,13 +41,12 @@ function filterResults(event) {
 				return acc+el;
 			}, '');
 			const movieList = document.querySelector('#movie-list');
-			console.log(str);
 			movieList.innerHTML = str;
 		}
 	});
 	req.addEventListener('error', function(e) {
 		const err = document.createElement('p');
-		err.innerHTML = 'Something went wrong, please try again';
+		err.innerHTML = '<p style="color:red;">Something went wrong, please try again</p>';
 		document.querySelector('.main').appendChild(err);
 	});
 	req.send();

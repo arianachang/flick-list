@@ -3,7 +3,7 @@
 <div class="leftContainer">
   Filter movies by:
   <form method="GET" action="" id="filterForm">
-   <input type="radio" name="filter" value="default" checked="true">Order Added<br>
+   <input type="radio" name="filter" value="default" checked="true">Order Added (Default)<br>
    <input type="radio" name="filter" value="title">Title (A-Z)<br>
    <input type="radio" name="filter" value="genre">Genre<br>
    <input type="radio" name="filter" value="year">Year<br>
@@ -37,5 +37,6 @@
 </table>
 {{#if user}}<br><center><input type="submit" value="Add Movie(s) to Watch List"></center>{{/if}}
 </form>
+<br>{{#if msg}}<article class="error">{{msg}}</article>{{/if}}
 </div>
 </div>
